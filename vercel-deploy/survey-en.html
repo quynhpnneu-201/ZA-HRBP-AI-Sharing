@@ -494,22 +494,6 @@
         </div>
       </div>
 
-      <div class="field">
-        <label class="q-label"><span class="q-index">Q8.</span>What (if anything) makes you hesitant or worried about learning AI?</label>
-        <div class="q-hint">Multiple choices allowed</div>
-        <div class="choice-grid cols-2">
-          <label class="choice"><input type="checkbox" name="q10" value="No / not enough time"><span class="choice-mark"></span><span class="choice-text">No / not enough time</span></label>
-          <label class="choice"><input type="checkbox" name="q10" value="Don't know where to start"><span class="choice-mark"></span><span class="choice-text">Don't know where to start</span></label>
-          <label class="choice"><input type="checkbox" name="q10" value="Concerned about data security / privacy"><span class="choice-mark"></span><span class="choice-text">Concerned about data security / privacy</span></label>
-          <label class="choice"><input type="checkbox" name="q10" value="Intimidated by technology, afraid of falling behind"><span class="choice-mark"></span><span class="choice-text">Intimidated by technology, afraid of falling behind</span></label>
-          <label class="choice"><input type="checkbox" name="q10" value="Don't see it as directly relevant to my work"><span class="choice-mark"></span><span class="choice-text">Don't see it as directly relevant to my work</span></label>
-        </div>
-        <div class="choice-other">
-          <label class="choice"><input type="checkbox" name="q10" value="Other"><span class="choice-mark"></span><span class="choice-text">Other</span></label>
-          <input type="text" name="q10_other" placeholder="Please specify if you selected “Other”" style="margin-top:8px;">
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -525,18 +509,18 @@
     <div class="section-body">
 
       <div class="field">
-        <label class="q-label"><span class="q-index">Q9.</span>In your day-to-day HRBP work, what are 1–3 pain points / time-consuming tasks you'd like AI to help solve?</label>
+        <label class="q-label"><span class="q-index">Q8.</span>In your day-to-day HRBP work, what are 1–3 pain points / time-consuming tasks you'd like AI to help solve?</label>
         <textarea name="q11" rows="4" placeholder="e.g. screening CVs, compiling turnover reports..."></textarea>
       </div>
 
       <div class="field">
-        <label class="q-label"><span class="q-index">Q10.</span>After this workshop series, what would you like to be able to do?</label>
+        <label class="q-label"><span class="q-index">Q9.</span>After this workshop series, what would you like to be able to do?</label>
         <div class="q-hint">Specific expected outcomes</div>
         <textarea name="q12" rows="4" placeholder="Share your expectations here..."></textarea>
       </div>
 
       <div class="field">
-        <label class="q-label"><span class="q-index">Q11.</span>Which group do you consider yourself in?</label>
+        <label class="q-label"><span class="q-index">Q10.</span>Which group do you consider yourself in?</label>
         <div class="q-hint">Choose 1</div>
         <div class="choice-grid">
           <label class="choice"><input type="radio" name="q13" value="Beginner"><span class="choice-mark"></span><span class="choice-text">Beginner — haven't / barely used AI</span></label>
@@ -560,7 +544,7 @@
     <div class="section-body">
 
       <div class="field">
-        <label class="q-label"><span class="q-index">Q12.</span>Your preferred learning format</label>
+        <label class="q-label"><span class="q-index">Q11.</span>Your preferred learning format</label>
         <div class="q-hint">Multiple choices allowed</div>
         <div class="choice-grid cols-2">
           <label class="choice"><input type="checkbox" name="q14" value="Theory presentation / demo"><span class="choice-mark"></span><span class="choice-text">Theory presentation / demo</span></label>
@@ -571,7 +555,7 @@
       </div>
 
       <div class="field">
-        <label class="q-label"><span class="q-index">Q13.</span>What session duration works best for you?</label>
+        <label class="q-label"><span class="q-index">Q12.</span>What session duration works best for you?</label>
         <div class="choice-grid">
           <label class="choice"><input type="radio" name="q15" value="About 1 hour"><span class="choice-mark"></span><span class="choice-text">About 1 hour</span></label>
           <label class="choice"><input type="radio" name="q15" value="1–1.5 hours"><span class="choice-mark"></span><span class="choice-text">1–1.5 hours</span></label>
@@ -594,7 +578,7 @@
     </div>
     <div class="section-body">
       <div class="field">
-        <label class="q-label"><span class="q-index">Q14.</span>Do you have any other suggestions or feedback for this workshop series?</label>
+        <label class="q-label"><span class="q-index">Q13.</span>Do you have any other suggestions or feedback for this workshop series?</label>
         <textarea name="q16" rows="4" placeholder="Share your feedback here..."></textarea>
       </div>
     </div>
@@ -629,7 +613,7 @@
         <li><b>Low interest – High knowledge:</b> leverage them as a champion, no need to prioritize further training.</li>
       </ul>
 
-      <p>Also cross-check with Question 11 (self-assessed group) to confirm the above decision fits the group's actual preferences, before finalizing the workshop flow.</p>
+      <p>Also cross-check with Question 10 (self-assessed group) to confirm the above decision fits the group's actual preferences, before finalizing the workshop flow.</p>
     </div>
   </details>
 
@@ -655,11 +639,11 @@
 <script>
   var TOPICS = [
     "1. Writing JDs / job descriptions with AI",
-    "3. Drafting emails, policies, internal announcements with AI",
-    "4. Analyzing HR data (turnover, engagement, C&B...) with AI",
-    "7. Automating HR processes (workflows, forms, approvals) with AI",
-    "8. Chatbots / virtual assistants for employee support",
-    "9. Ethics & data security when using AI in HR"
+    "2. Drafting emails, policies, internal announcements with AI",
+    "3. Analyzing HR data (turnover, engagement, C&B...) with AI",
+    "4. Automating HR processes (workflows, forms, approvals) with AI",
+    "5. Chatbots / virtual assistants for employee support",
+    "6. Ethics & data security when using AI in HR"
   ];
 
   function escapeHtml(s){
@@ -777,8 +761,6 @@
       q7: q7,
       q9: arr(raw.q9),
       q9_other: raw.q9_other || null,
-      q10: arr(raw.q10),
-      q10_other: raw.q10_other || null,
       q11: raw.q11 || null,
       q12: raw.q12 || null,
       q13: raw.q13 || null,
