@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRBP - TNA_AI Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --zalo-blue: #0068FF;
+    --zalo-blue-dark: #0052CC;
+    --zalo-blue-deep: #0A2F6B;
+    --zalo-cyan: #00C2FF;
+    --zalo-mint: #17D8C4;
+    --zalo-coral: #FF6B6B;
+    --zalo-amber: #FFB800;
+    --zalo-yellow: #FFD93D;
+    --ink: #0A2540;
+    --ink-soft: #4A5B78;
+    --line: #E3ECFB;
+    --card: #FFFFFF;
+    --bg-1: #EAF3FF;
+    --bg-2: #F6FBFF;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 8px 24px rgba(0,104,255,0.10);
+    --shadow-card: 0 4px 16px rgba(10,37,64,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Roboto', Arial, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 90% -10%, rgba(0,194,255,0.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(23,216,196,0.14), transparent 55%),
+      linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:'Nunito','Roboto',Arial,sans-serif; margin:0; color:var(--zalo-blue-deep);}
+  p{margin:0;}
+  a{color:var(--zalo-blue);}
+
+  .site-nav{
+    max-width:900px; margin:0 auto; padding:14px 16px 0;
+    display:flex; gap:16px; font-size:12.5px; font-weight:700;
+  }
+  .site-nav a{color:var(--zalo-blue-dark); text-decoration:none; padding:6px 10px; border-radius:999px;}
+  .site-nav a:hover{background:rgba(0,104,255,0.08);}
+  .site-nav a.current{background:var(--zalo-blue); color:#fff;}
+
+  /* ---------- Top progress bar ---------- */
+  .progress-shell{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:10px 16px;
+  }
+  .progress-inner{
+    max-width:900px; margin:0 auto;
+    display:flex; align-items:center; gap:12px;
+  }
+  .progress-label{font-size:12.5px; font-weight:700; color:var(--zalo-blue-dark); white-space:nowrap;}
+  .progress-track{
+    flex:1; height:10px; border-radius:999px; background:var(--line); overflow:hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .progress-fill{
+    height:100%; width:0%; border-radius:999px;
+    background:linear-gradient(90deg, var(--zalo-mint), var(--zalo-cyan), var(--zalo-blue));
+    transition:width .35s ease;
+  }
+  .progress-pct{font-size:12.5px; font-weight:800; color:var(--zalo-blue); min-width:38px; text-align:right;}
+
+  /* ---------- Hero ---------- */
+  .hero{ max-width:900px; margin:20px auto 0; padding:0 16px; }
+  .hero-card{
+    position:relative; border-radius:var(--radius-lg); padding:38px 32px 32px;
+    background:linear-gradient(135deg, var(--zalo-blue) 0%, #1E8CFF 45%, var(--zalo-cyan) 100%);
+    color:#fff; overflow:hidden; box-shadow: var(--shadow-soft);
+  }
+  .hero-card::before{
+    content:""; position:absolute; right:-60px; top:-80px; width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+  }
+  .hero-card::after{
+    content:""; position:absolute; left:-40px; bottom:-90px; width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(23,216,196,0.35), transparent 70%);
+  }
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.35); padding:6px 14px; border-radius:999px;
+    font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-bottom:16px;
+  }
+  .hero-title{font-size:28px; font-weight:900; color:#fff; line-height:1.25; position:relative; z-index:1;}
+  .hero-sub{font-size:16px; font-weight:700; color:#EAF7FF; margin-top:6px; position:relative; z-index:1;}
+  .hero-desc{ margin-top:16px; font-size:14.5px; line-height:1.65; color:#F0FAFF; max-width:680px; position:relative; z-index:1; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; position:relative; z-index:1; }
+  .hero-chip{
+    background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.3); border-radius:var(--radius-sm);
+    padding:10px 14px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px;
+  }
+  .hero-note{
+    margin-top:18px; padding:12px 16px; border-radius:var(--radius-sm);
+    background:rgba(10,37,64,0.20); border:1px dashed rgba(255,255,255,0.4);
+    font-size:13px; line-height:1.6; color:#fff; position:relative; z-index:1;
+  }
+
+  .wrap{max-width:900px; margin:0 auto; padding:24px 16px 90px;}
+
+  .section{
+    background:var(--card); border-radius:var(--radius-lg); box-shadow:var(--shadow-card);
+    border:1px solid var(--line); margin-bottom:22px; overflow:hidden; scroll-margin-top:80px;
+  }
+  .section-head{
+    display:flex; align-items:center; gap:14px; padding:20px 24px;
+    background:linear-gradient(90deg, rgba(0,104,255,0.07), rgba(0,194,255,0.04));
+    border-bottom:1px solid var(--line);
+  }
+  .section-num{
+    flex:0 0 auto; width:42px; height:42px; border-radius:14px;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+    color:#fff; font-weight:900; font-size:17px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px rgba(0,104,255,0.30);
+  }
+  .section-title{font-size:18px; font-weight:800;}
+  .section-sub{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-top:2px;}
+  .section-body{padding:22px 24px 26px;}
+
+  .field{margin-bottom:22px;}
+  .field:last-child{margin-bottom:0;}
+  .q-label{ font-size:14.5px; font-weight:700; color:var(--ink); line-height:1.55; margin-bottom:10px; display:block; }
+  .q-index{color:var(--zalo-blue); font-weight:900; margin-right:4px;}
+  .q-hint{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-top:-4px; margin-bottom:10px;}
+
+  input[type="text"], textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:var(--radius-sm); padding:11px 14px;
+    font-size:14px; font-family:'Roboto',Arial,sans-serif; color:var(--ink); background:var(--bg-2);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none; border-color:var(--zalo-blue); box-shadow:0 0 0 4px rgba(0,104,255,0.12); background:#fff;
+  }
+  textarea{resize:vertical; min-height:64px; line-height:1.5;}
+
+  .choice-grid{display:flex; flex-direction:column; gap:8px;}
+  .choice-grid.cols-2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .choice{
+    position:relative; display:flex; align-items:center; gap:10px; padding:11px 14px;
+    border:1.5px solid var(--line); border-radius:var(--radius-sm); background:var(--bg-2);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .choice:hover{border-color:var(--zalo-cyan); background:#fff;}
+  .choice input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer;}
+  .choice-mark{
+    flex:0 0 auto; width:20px; height:20px; border-radius:50%; border:2px solid #B9CCEE; background:#fff;
+    display:flex; align-items:center; justify-content:center; transition:all .15s ease;
+  }
+  .choice input[type="checkbox"] + .choice-mark{border-radius:6px;}
+  .choice-mark::after{
+    content:""; width:10px; height:10px; border-radius:50%;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+    transform:scale(0); transition:transform .15s ease;
+  }
+  .choice input[type="checkbox"] + .choice-mark::after{ width:11px; height:11px; border-radius:3px; background:none; }
+  .choice input[type="checkbox"] + .choice-mark::after{
+    content:"✓"; color:#fff; font-size:12px; font-weight:900;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+  }
+  .choice input:checked ~ .choice-mark{border-color:var(--zalo-blue);}
+  .choice input:checked ~ .choice-mark::after{transform:scale(1);}
+  .choice input:checked ~ .choice-text{color:var(--zalo-blue-dark); font-weight:700;}
+  .choice:has(input:checked), .choice.is-checked{
+    border-color:var(--zalo-blue);
+    background:linear-gradient(90deg, rgba(0,104,255,0.06), rgba(0,194,255,0.04));
+    box-shadow:0 2px 8px rgba(0,104,255,0.10);
+  }
+  .choice-text{font-size:13.8px; font-weight:600; color:var(--ink); line-height:1.4;}
+  .choice-other{margin-top:8px;}
+
+  .scale-card{ border:1.5px solid var(--line); border-radius:var(--radius-md); background:var(--bg-2); padding:16px; margin-top:6px; }
+  .scale-legend{ display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--ink-soft); margin-bottom:12px; padding:0 2px; }
+  .scale-options{display:flex; gap:8px;}
+  .scale-opt{ flex:1; position:relative; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .scale-opt input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; width:100%; height:100%;}
+  .scale-opt-inner{
+    width:44px; height:44px; border-radius:50%; border:2px solid var(--line); background:#fff;
+    display:flex; align-items:center; justify-content:center; transition:all .15s ease; cursor:pointer;
+  }
+  .scale-opt-num{font-size:16px; font-weight:900; color:var(--zalo-blue-deep);}
+  .scale-opt input:checked ~ .scale-opt-inner{
+    border-color:var(--zalo-blue); background:linear-gradient(160deg, var(--zalo-blue), #1E8CFF);
+  }
+  .scale-opt input:checked ~ .scale-opt-inner .scale-opt-num{color:#fff;}
+  @media (max-width:380px){ .scale-opt-inner{width:38px; height:38px;} .scale-opt-num{font-size:14px;} }
+  .scale-desc-list{ margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+  .scale-desc-item{ display:flex; gap:8px; font-size:12px; color:var(--ink-soft); font-weight:500; }
+  .scale-desc-item b{color:var(--zalo-blue-dark); font-weight:800; min-width:14px;}
+
+  .matrix-legend{ display:flex; justify-content:flex-end; gap:14px; font-size:11px; font-weight:700; color:var(--ink-soft); margin-bottom:10px; padding-right:2px; }
+  .matrix{display:flex; flex-direction:column; gap:10px;}
+  .matrix-row{
+    border:1.5px solid var(--line); border-radius:var(--radius-md); background:var(--bg-2); padding:12px 14px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .matrix-row-title{font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.4;}
+  .matrix-scale{display:flex; gap:6px;}
+  .matrix-opt{ flex:1; position:relative; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .matrix-opt input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer;}
+  .matrix-opt-inner{
+    width:38px; height:38px; border-radius:50%; border:2px solid #D9E6FB; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:var(--zalo-blue-deep); transition:all .15s ease;
+  }
+  .matrix-opt input:checked ~ .matrix-opt-inner{
+    border-color:transparent; color:#fff;
+    background:linear-gradient(135deg, var(--zalo-mint), var(--zalo-blue));
+    box-shadow:0 3px 8px rgba(0,104,255,0.30);
+  }
+  @media (max-width:520px){ .matrix-opt-inner{width:32px; height:32px; font-size:12px;} }
+
+  .nav-dots{
+    position:fixed; right:18px; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:10px; z-index:40;
+  }
+  .nav-dot{ width:11px; height:11px; border-radius:50%; background:#C7DBFB; cursor:pointer; transition:all .2s ease; border:none; padding:0; }
+  .nav-dot:hover{background:var(--zalo-cyan); transform:scale(1.25);}
+  .nav-dot.active{background:var(--zalo-blue); transform:scale(1.4); box-shadow:0 0 0 4px rgba(0,104,255,0.15);}
+  @media (max-width:900px){ .nav-dots{display:none;} }
+
+  .submit-card{
+    text-align:center; padding:36px 24px;
+    background:linear-gradient(135deg, var(--zalo-blue-deep), var(--zalo-blue) 60%, var(--zalo-cyan));
+    border-radius:var(--radius-lg); color:#fff; box-shadow:var(--shadow-soft);
+  }
+  .submit-card h3{color:#fff; font-size:20px; margin-bottom:8px;}
+  .submit-card p{color:#EAF7FF; font-size:13.5px; margin-bottom:20px;}
+  .btn-submit{
+    background:linear-gradient(135deg, var(--zalo-amber), var(--zalo-coral));
+    color:#fff; border:none; font-family:'Nunito',Arial,sans-serif;
+    font-weight:900; font-size:16px; padding:15px 42px; border-radius:999px; cursor:pointer;
+    box-shadow:0 10px 24px rgba(255,107,107,0.35); transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-submit:hover{transform:translateY(-2px) scale(1.02); box-shadow:0 14px 30px rgba(255,107,107,0.45);}
+  .btn-submit:active{transform:translateY(0) scale(0.99);}
+  .btn-submit:disabled{opacity:.6; cursor:wait; transform:none;}
+  .submit-sub{margin-top:14px; font-size:12px; color:rgba(255,255,255,0.8);}
+  .submit-error{
+    margin-top:14px; padding:10px 14px; border-radius:var(--radius-sm);
+    background:rgba(255,107,107,0.18); border:1px solid rgba(255,107,107,0.5);
+    font-size:12.5px; color:#fff; display:none;
+  }
+  .submit-error.show{display:block;}
+
+  .appendix{ border:1.5px dashed #C7CFE0; border-radius:var(--radius-lg); background:#F4F6FB; margin-top:28px; overflow:hidden; }
+  .appendix summary{ cursor:pointer; list-style:none; padding:18px 24px; display:flex; align-items:center; gap:12px; font-weight:800; font-size:14.5px; color:var(--ink-soft); }
+  .appendix summary::-webkit-details-marker{display:none;}
+  .appendix summary::before{ content:"▸"; font-size:14px; color:var(--zalo-blue); transition:transform .2s; }
+  .appendix[open] summary::before{transform:rotate(90deg);}
+  .appendix-body{padding:0 24px 22px; font-size:13px; color:var(--ink-soft); line-height:1.7;}
+  .appendix-body h4{font-size:13.5px; color:var(--zalo-blue-deep); margin:14px 0 6px;}
+  .appendix-body ul{margin:6px 0 0; padding-left:20px;}
+  .appendix-body li{margin-bottom:6px;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,37,64,0.55);
+    display:none; align-items:center; justify-content:center; z-index:100;
+    padding:20px; backdrop-filter:blur(4px);
+  }
+  .overlay.show{display:flex;}
+  .overlay-card{
+    background:#fff; border-radius:var(--radius-lg); padding:36px 30px;
+    max-width:440px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    position:relative; overflow:hidden;
+  }
+  .overlay-emoji{font-size:54px; margin-bottom:6px;}
+  .overlay-card h3{font-size:21px; margin-bottom:10px;}
+  .overlay-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:20px;}
+  .overlay-actions{display:flex; flex-direction:column; gap:10px;}
+  .btn-secondary{
+    border:1.5px solid var(--line); background:#fff; color:var(--zalo-blue-dark);
+    font-weight:700; font-size:13.5px; padding:12px 18px; border-radius:999px; cursor:pointer;
+  }
+  .btn-secondary:hover{border-color:var(--zalo-blue); background:var(--bg-2);}
+  .btn-close{
+    background:var(--zalo-blue); color:#fff; border:none; font-weight:700;
+    font-size:13.5px; padding:12px 18px; border-radius:999px; cursor:pointer;
+  }
+
+  footer{ text-align:center; font-size:12px; color:var(--ink-soft); padding:20px 16px 40px; }
+
+  @media (max-width:640px){
+    .hero-card{padding:28px 20px 24px;}
+    .hero-title{font-size:22px;}
+    .section-head{padding:16px 18px;}
+    .section-body{padding:18px 18px 22px;}
+    .choice-grid.cols-2{grid-template-columns:1fr;}
+  }
+  @media (max-width:380px){
+    .hero-title{font-size:19px;}
+    .matrix-opt-inner{font-size:11px;}
+    .section-num{width:36px; height:36px; font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html">🏠 Trang chủ</a>
+  <a href="survey-vi.html" class="current">📋 Khảo sát (VI)</a>
+  <a href="survey-en.html">📋 Survey (EN)</a>
+  <a href="results.html">📊 Kết quả trực tiếp</a>
+</nav>
+
+<div class="progress-shell">
+  <div class="progress-inner">
+    <span class="progress-label">Tiến độ khảo sát</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+</div>
+
+<div class="nav-dots" id="navDots"></div>
+
+<form id="surveyForm">
+
+<div class="hero">
+  <div class="hero-card">
+    <span class="hero-badge">📋 TNA Survey · HRBP Team</span>
+    <div class="hero-title">Phiếu khảo sát nhu cầu đào tạo (TNA)</div>
+    <div class="hero-sub">Chuỗi Workshop “AI Application” dành cho HRBP Team</div>
+    <div class="hero-desc">
+      Khảo sát này nhằm xác định <b>(1)</b> mức độ hiểu biết / kinh nghiệm hiện tại của mỗi thành viên với các ứng dụng AI liên quan đến công việc HRBP, và <b>(2)</b> mức độ hứng thú &amp; sẵn sàng tham gia học tập — để đội ngũ HRBP thiết kế nội dung, độ khó và lộ trình chuỗi workshop phù hợp nhất với nhu cầu thực tế của nhóm (bao gồm cả FTE và Collaborator).
+    </div>
+    <div class="hero-meta">
+      <span class="hero-chip">⏱️ Thời gian hoàn thành: 8–10 phút</span>
+      <span class="hero-chip">✅ Không có câu trả lời đúng/sai</span>
+      <span class="hero-chip">🔒 Chỉ dùng để thiết kế đào tạo</span>
+    </div>
+    <div class="hero-note">
+      💬 Hãy trả lời theo đúng thực tế hiện tại của bạn để kết quả training sát nhu cầu nhất. Thông tin thu thập <b>không</b> dùng để đánh giá performance cá nhân.
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PHẦN 1 -->
+  <section class="section" id="part1" data-part="1">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Thông tin chung</div>
+        <div class="section-sub">General Information</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="q-label">Họ và tên</label>
+        <input type="text" name="fullname" placeholder="Nhập họ và tên của bạn">
+      </div>
+      <div class="field">
+        <label class="q-label">Job title</label>
+        <input type="text" name="role" placeholder="Ví dụ: HRBP Executive, Senior HRBP...">
+      </div>
+      <div class="field">
+        <label class="q-label">Loại hình nhân sự</label>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="radio" name="staff_type" value="FTE"><span class="choice-mark"></span><span class="choice-text">FTE</span></label>
+          <label class="choice"><input type="radio" name="staff_type" value="Collaborator"><span class="choice-mark"></span><span class="choice-text">Collaborator</span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 2 -->
+  <section class="section" id="part2" data-part="2">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Mức độ hiểu biết &amp; kinh nghiệm hiện tại với AI</div>
+        <div class="section-sub">Baseline</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 1.</span>Bạn đã từng sử dụng công cụ AI (ChatGPT, Claude, Gemini, Copilot...) trong công việc chưa?</label>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q1" value="Chưa từng dùng"><span class="choice-mark"></span><span class="choice-text">Chưa từng dùng</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Đã thử vài lần, chưa dùng thường xuyên"><span class="choice-mark"></span><span class="choice-text">Đã thử vài lần, chưa dùng thường xuyên</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Dùng thường xuyên hàng tuần"><span class="choice-mark"></span><span class="choice-text">Dùng thường xuyên hàng tuần</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Dùng hàng ngày, như một phần công việc"><span class="choice-mark"></span><span class="choice-text">Dùng hàng ngày, như một phần công việc</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 2.</span>Với từng chủ đề dưới đây, đánh giá mức độ HIỂU BIẾT / KINH NGHIỆM, cụ thể là ứng dụng AI, hiện tại của bạn</label>
+        <div class="q-hint">Đánh giá mức độ hiểu biết / kinh nghiệm hiện tại của bạn với từng chủ đề bên dưới</div>
+        <div class="scale-card">
+          <div class="scale-desc-list">
+            <div class="scale-desc-item"><b>1</b> Chưa từng dùng AI, chưa hiểu khái niệm cơ bản</div>
+            <div class="scale-desc-item"><b>2</b> Đã nghe / dùng thử 1–2 lần, chưa tự tin sử dụng</div>
+            <div class="scale-desc-item"><b>3</b> Dùng được ở mức cơ bản (viết prompt đơn giản, dùng cho vài task quen thuộc)</div>
+            <div class="scale-desc-item"><b>4</b> Dùng thành thạo cho nhiều tác vụ, tự tin áp dụng vào công việc hàng ngày</div>
+            <div class="scale-desc-item"><b>5</b> Thành thạo, có thể hướng dẫn / chia sẻ lại cho người khác</div>
+          </div>
+        </div>
+        <div class="matrix-legend"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="matrix" data-matrix="q3"></div>
+        <div class="q-hint" style="margin-top:14px;">Ngoài những ứng dụng này, còn ứng dụng nào bạn đã áp dụng AI trong công việc mà bạn muốn chia sẻ? Viết cụ thể.</div>
+        <textarea name="q3_other_apps" rows="3" placeholder="Chia sẻ cụ thể ứng dụng AI khác bạn đã áp dụng trong công việc..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 3.</span>Bạn đã từng sử dụng công cụ AI nào?</label>
+        <div class="q-hint">Có thể chọn nhiều</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q4" value="ChatGPT"><span class="choice-mark"></span><span class="choice-text">ChatGPT</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Claude"><span class="choice-mark"></span><span class="choice-text">Claude</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Gemini"><span class="choice-mark"></span><span class="choice-text">Gemini</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Microsoft Copilot"><span class="choice-mark"></span><span class="choice-text">Microsoft Copilot</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Notion AI / Canva AI"><span class="choice-mark"></span><span class="choice-text">Notion AI / Canva AI</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q4" value="Khác"><span class="choice-mark"></span><span class="choice-text">Khác</span></label>
+          <input type="text" name="q4_other" placeholder="Ghi rõ nếu chọn “Khác”" style="margin-top:8px;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 4.</span>Bạn đã từng tham gia training/khoá học nào về AI chưa?</label>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="radio" name="q5" value="Có"><span class="choice-mark"></span><span class="choice-text">Có</span></label>
+          <label class="choice"><input type="radio" name="q5" value="Chưa"><span class="choice-mark"></span><span class="choice-text">Chưa</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 5.</span>Nếu có, mô tả ngắn (tên khoá học, nội dung chính)</label>
+        <textarea name="q6" rows="3" placeholder="Chia sẻ ngắn gọn tại đây..."></textarea>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PHẦN 3 -->
+  <section class="section" id="part3" data-part="3">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Mức độ hứng thú &amp; sẵn sàng tham gia học</div>
+        <div class="section-sub">Interest &amp; Willingness</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 6.</span>Với từng chủ đề dưới đây, đánh giá mức độ HỨNG THÚ muốn học của bạn</label>
+        <div class="q-hint">Đánh giá mức độ hứng thú muốn học của bạn với từng chủ đề bên dưới</div>
+        <div class="scale-card">
+          <div class="scale-desc-list">
+            <div class="scale-desc-item"><b>1</b> Không hứng thú, không muốn học chủ đề này</div>
+            <div class="scale-desc-item"><b>2</b> Ít hứng thú, chưa ưu tiên học</div>
+            <div class="scale-desc-item"><b>3</b> Bình thường, có thể học nếu phù hợp</div>
+            <div class="scale-desc-item"><b>4</b> Hứng thú, muốn học</div>
+            <div class="scale-desc-item"><b>5</b> Rất hứng thú, muốn học sâu</div>
+          </div>
+        </div>
+        <div class="matrix-legend"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="matrix" data-matrix="q7"></div>
+        <div class="q-hint" style="margin-top:14px;">Những topic khác bạn muốn học (nếu có)</div>
+        <textarea name="q7_other_topics" rows="3" placeholder="Chia sẻ chủ đề khác bạn muốn học thêm..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 7.</span>Điều gì khiến bạn hứng thú nhất khi nghĩ đến việc học AI application?</label>
+        <div class="q-hint">Có thể chọn nhiều</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q9" value="Tăng hiệu suất, tiết kiệm thời gian"><span class="choice-mark"></span><span class="choice-text">Tăng hiệu suất, tiết kiệm thời gian</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Giảm tác vụ lặp lại, thủ công"><span class="choice-mark"></span><span class="choice-text">Giảm các tác vụ lặp lại, thủ công</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Cập nhật xu hướng công nghệ mới"><span class="choice-mark"></span><span class="choice-text">Cập nhật xu hướng công nghệ mới</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Tò mò cá nhân, muốn thử nghiệm"><span class="choice-mark"></span><span class="choice-text">Tò mò cá nhân, muốn thử nghiệm</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Yêu cầu từ công việc / cấp trên"><span class="choice-mark"></span><span class="choice-text">Yêu cầu từ công việc / cấp trên</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q9" value="Khác"><span class="choice-mark"></span><span class="choice-text">Khác</span></label>
+          <input type="text" name="q9_other" placeholder="Ghi rõ nếu chọn “Khác”" style="margin-top:8px;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 8.</span>Điều gì (nếu có) khiến bạn ngại hoặc lo lắng khi học AI?</label>
+        <div class="q-hint">Có thể chọn nhiều</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q10" value="Không có / không đủ thời gian"><span class="choice-mark"></span><span class="choice-text">Không có / không đủ thời gian</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Chưa biết bắt đầu từ đâu"><span class="choice-mark"></span><span class="choice-text">Chưa biết bắt đầu từ đâu</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Lo ngại về bảo mật / an toàn dữ liệu"><span class="choice-mark"></span><span class="choice-text">Lo ngại về bảo mật / an toàn dữ liệu</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Ngại công nghệ, sợ không theo kịp"><span class="choice-mark"></span><span class="choice-text">Ngại công nghệ, sợ không theo kịp</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Không thấy liên quan trực tiếp đến công việc"><span class="choice-mark"></span><span class="choice-text">Không thấy liên quan trực tiếp đến công việc</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q10" value="Khác"><span class="choice-mark"></span><span class="choice-text">Khác</span></label>
+          <input type="text" name="q10_other" placeholder="Ghi rõ nếu chọn “Khác”" style="margin-top:8px;">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PHẦN 4 -->
+  <section class="section" id="part4" data-part="4">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">Nhu cầu học tập cụ thể</div>
+        <div class="section-sub">Specific Learning Needs</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 9.</span>Trong công việc HRBP hàng ngày, đâu là 1–3 “pain point” / tác vụ tốn thời gian nhất mà bạn muốn AI hỗ trợ giải quyết?</label>
+        <textarea name="q11" rows="4" placeholder="Ví dụ: sàng lọc CV, tổng hợp báo cáo turnover..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 10.</span>Sau chuỗi workshop này, bạn mong muốn mình có thể làm được gì?</label>
+        <div class="q-hint">Kỳ vọng kết quả cụ thể</div>
+        <textarea name="q12" rows="4" placeholder="Chia sẻ kỳ vọng của bạn tại đây..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 11.</span>Bạn tự đánh giá mình thuộc nhóm nào?</label>
+        <div class="q-hint">Chọn 1</div>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q13" value="Người mới bắt đầu"><span class="choice-mark"></span><span class="choice-text">Người mới bắt đầu — chưa/gần như chưa dùng AI</span></label>
+          <label class="choice"><input type="radio" name="q13" value="Đã biết cơ bản"><span class="choice-mark"></span><span class="choice-text">Đã biết cơ bản — muốn học nâng cao, áp dụng sâu hơn vào công việc</span></label>
+          <label class="choice"><input type="radio" name="q13" value="Đã dùng thành thạo"><span class="choice-mark"></span><span class="choice-text">Đã dùng thành thạo — muốn học ứng dụng chuyên sâu / công cụ nâng cao</span></label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PHẦN 5 -->
+  <section class="section" id="part5" data-part="5">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">Hình thức học mong muốn</div>
+        <div class="section-sub">Preferred Learning Format</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 12.</span>Hình thức học tập bạn mong muốn</label>
+        <div class="q-hint">Có thể chọn nhiều</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q14" value="Trình bày lý thuyết / demo"><span class="choice-mark"></span><span class="choice-text">Trình bày lý thuyết / demo</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="Hands-on thực hành trực tiếp"><span class="choice-mark"></span><span class="choice-text">Hands-on thực hành trực tiếp</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="Case study / thảo luận nhóm"><span class="choice-mark"></span><span class="choice-text">Case study / thảo luận nhóm</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="Kết hợp (mix) các hình thức trên"><span class="choice-mark"></span><span class="choice-text">Kết hợp (mix) các hình thức trên</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 13.</span>Thời lượng mỗi buổi học bạn thấy phù hợp nhất?</label>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q15" value="Khoảng 1 giờ"><span class="choice-mark"></span><span class="choice-text">Khoảng 1 giờ</span></label>
+          <label class="choice"><input type="radio" name="q15" value="1–1.5 giờ"><span class="choice-mark"></span><span class="choice-text">1–1.5 giờ</span></label>
+          <label class="choice"><input type="radio" name="q15" value="Khoảng 2 giờ"><span class="choice-mark"></span><span class="choice-text">Khoảng 2 giờ</span></label>
+          <label class="choice"><input type="radio" name="q15" value="Trên 2 giờ"><span class="choice-mark"></span><span class="choice-text">Trên 2 giờ</span></label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PHẦN 6 -->
+  <section class="section" id="part6" data-part="6">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">Góp ý thêm</div>
+        <div class="section-sub">Additional Feedback</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="q-label"><span class="q-index">Câu 14.</span>Bạn có đề xuất / góp ý nào khác cho chuỗi workshop này không?</label>
+        <textarea name="q16" rows="4" placeholder="Chia sẻ góp ý của bạn tại đây..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="submit-card">
+    <h3>🎉 Gần xong rồi!</h3>
+    <p>Cảm ơn bạn đã dành thời gian hoàn thành khảo sát. Ý kiến của bạn sẽ giúp đội ngũ HRBP thiết kế chuỗi workshop AI phù hợp nhất cho cả nhóm.</p>
+    <button type="submit" class="btn-submit" id="submitBtn">Nộp khảo sát 🚀</button>
+    <div class="submit-sub">Câu trả lời sẽ được gửi thẳng lên bảng kết quả trực tiếp cho đội ngũ HRBP.</div>
+    <div class="submit-error" id="submitError">⚠️ Không gửi được lên hệ thống (kiểm tra kết nối mạng). Bạn vẫn có thể tải kết quả về máy để gửi thủ công.</div>
+  </div>
+
+  <details class="appendix">
+    <summary>📎 Phụ lục — dành cho HRBP / người thiết kế chương trình</summary>
+    <div class="appendix-body">
+      <h4>Cách sử dụng kết quả TNA để quyết định flow thiết kế chuỗi workshop</h4>
+      <p>Sau khi thu thập phiếu, xem trực tiếp bảng "Kết quả trực tiếp" (results.html) để so sánh Câu 2 (hiểu biết) và Câu 6 (hứng thú) theo từng chủ đề — trang này tự tính điểm trung bình và cập nhật liên tục.</p>
+
+      <h4>Nguyên tắc quyết định</h4>
+      <ul>
+        <li>Nếu độ lệch trình độ <b>giữa các cá nhân</b> cao (một số người rất mới, một số đã thành thạo) ở đa số chủ đề → nên thiết kế theo <b>PROFICIENCY LEVEL</b>: chia track Beginner / Intermediate–Advanced, có buổi nền tảng chung trước khi tách nhóm.</li>
+        <li>Nếu trình độ giữa các cá nhân khá đồng đều, nhưng điểm khác biệt rõ <b>giữa các chủ đề</b> (ví dụ ai cũng yếu ở Prompt Engineering nhưng đã ổn ở việc viết email) → nên thiết kế theo <b>TOPIC</b>: các buổi nối tiếp theo từng chủ đề ứng dụng, học chung cả nhóm.</li>
+        <li>Nếu cả hai yếu tố trên đều biến động lớn → thiết kế <b>HYBRID</b>: 1 buổi nền tảng chung (align kiến thức + kỳ vọng) + các module theo chủ đề, trong mỗi module có bài tập phân theo 2 mức độ khó (basic / advanced) để mọi người tham gia cùng lúc nhưng thực hành khác độ khó.</li>
+      </ul>
+
+      <h4>Đối chiếu Hiểu biết (Câu 2) với Hứng thú (Câu 6) theo từng chủ đề để ưu tiên nội dung</h4>
+      <ul>
+        <li><b>Hứng thú cao – Hiểu biết thấp:</b> ưu tiên đưa vào chương trình sớm (nhu cầu thực, dễ tạo động lực).</li>
+        <li><b>Hứng thú cao – Hiểu biết cao:</b> có thể mời làm case study chia sẻ / mentor cho nhóm.</li>
+        <li><b>Hứng thú thấp – Hiểu biết thấp:</b> cần làm rõ lợi ích / use case cụ thể trước khi đào tạo kỹ thuật.</li>
+        <li><b>Hứng thú thấp – Hiểu biết cao:</b> tận dụng làm champion, không cần ưu tiên training thêm.</li>
+      </ul>
+
+      <p>Đối chiếu thêm với Câu 11 (tự nhận nhóm) để xác nhận lại quyết định trên có phù hợp với nguyện vọng thực tế của nhóm hay không, trước khi chốt flow cuối cùng cho chuỗi workshop.</p>
+    </div>
+  </details>
+
+  <footer>Phiếu khảo sát TNA · AI Application Workshop cho HRBP Team · Nội dung bảo mật, chỉ dùng cho mục đích thiết kế đào tạo nội bộ</footer>
+
+</div>
+</form>
+
+<div class="overlay" id="thanksOverlay">
+  <div class="overlay-card">
+    <div class="overlay-emoji">🎉</div>
+    <h3 id="overlayTitle">Cảm ơn bạn đã hoàn thành khảo sát!</h3>
+    <p id="overlayText">Câu trả lời của bạn đã được ghi nhận lên bảng kết quả trực tiếp. Đội ngũ HRBP sẽ dùng thông tin này để thiết kế chuỗi workshop AI Application phù hợp nhất cho HRBP Team.</p>
+    <div class="overlay-actions">
+      <a href="results.html" class="btn-close" style="text-decoration:none; display:inline-block;">📊 Xem kết quả trực tiếp</a>
+      <button type="button" class="btn-secondary" id="downloadBtn">⬇️ Lưu bản sao (.json) về máy</button>
+      <button type="button" class="btn-secondary" id="closeOverlayBtn">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+  var TOPICS = [
+    "1. Viết JD / mô tả công việc bằng AI",
+    "3. Soạn email, chính sách, thông báo nội bộ bằng AI",
+    "4. Phân tích dữ liệu HR (turnover, engagement, C&B...) bằng AI",
+    "7. Automation quy trình HR (workflow, form, phê duyệt) bằng AI",
+    "8. Chatbot / trợ lý ảo hỗ trợ nhân viên",
+    "9. Đạo đức & bảo mật dữ liệu khi dùng AI trong HR"
+  ];
+
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function buildMatrix(name){
+    var el = document.querySelector('.matrix[data-matrix="' + name + '"]');
+    if(!el) return;
+    var html = "";
+    TOPICS.forEach(function(topic, idx){
+      html += '<div class="matrix-row"><div class="matrix-row-title">' + escapeHtml(topic) + '</div><div class="matrix-scale">';
+      for(var v=1; v<=5; v++){
+        html += '<label class="matrix-opt"><input type="radio" name="'+name+'_t'+idx+'" value="'+v+'"><span class="matrix-opt-inner">'+v+'</span></label>';
+      }
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+  buildMatrix('q3');
+  buildMatrix('q7');
+
+  var form = document.getElementById('surveyForm');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.section'));
+  var navDotsWrap = document.getElementById('navDots');
+  sections.forEach(function(sec){
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'nav-dot';
+    dot.title = sec.querySelector('.section-title').textContent;
+    dot.addEventListener('click', function(){
+      sec.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    navDotsWrap.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(navDotsWrap.children);
+
+  function trackableInputs(){
+    return Array.prototype.slice.call(form.querySelectorAll('input[type="text"], textarea, input[type="radio"], input[type="checkbox"]'));
+  }
+
+  function computeProgress(){
+    var groups = {};
+    trackableInputs().forEach(function(inp){
+      var key = inp.name;
+      if(!groups[key]) groups[key] = {type: inp.type, filled:false};
+      if(inp.type === 'radio' || inp.type === 'checkbox'){
+        if(inp.checked) groups[key].filled = true;
+      } else {
+        if(inp.value && inp.value.trim().length>0) groups[key].filled = true;
+      }
+    });
+    var keys = Object.keys(groups);
+    var filled = keys.filter(function(k){ return groups[k].filled; }).length;
+    var pct = keys.length ? Math.round((filled/keys.length)*100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+
+  function syncChoiceHighlight(){
+    Array.prototype.slice.call(form.querySelectorAll('.choice')).forEach(function(choiceEl){
+      var input = choiceEl.querySelector('input');
+      choiceEl.classList.toggle('is-checked', !!(input && input.checked));
+    });
+  }
+  form.addEventListener('change', function(e){
+    if(e.target && e.target.type === 'radio' && e.target.name){
+      Array.prototype.slice.call(form.querySelectorAll('input[name="'+e.target.name+'"]')).forEach(function(radio){
+        var choiceEl = radio.closest('.choice');
+        if(choiceEl) choiceEl.classList.toggle('is-checked', radio.checked);
+      });
+    } else if(e.target && e.target.type === 'checkbox'){
+      var choiceEl = e.target.closest('.choice');
+      if(choiceEl) choiceEl.classList.toggle('is-checked', e.target.checked);
+    }
+  });
+  syncChoiceHighlight();
+
+  form.addEventListener('input', computeProgress);
+  form.addEventListener('change', computeProgress);
+  computeProgress();
+
+  function updateActiveDot(){
+    var scrollPos = window.scrollY + 140;
+    var activeIdx = 0;
+    sections.forEach(function(sec, i){
+      if(sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===activeIdx); });
+  }
+  window.addEventListener('scroll', updateActiveDot);
+  updateActiveDot();
+
+  // ---------- build structured payload for Supabase ----------
+  function arr(v){ return v===undefined ? [] : (Array.isArray(v) ? v : [v]); }
+
+  function buildSupabaseRow(raw){
+    var q3 = {}, q7 = {};
+    for(var i=0;i<TOPICS.length;i++){
+      if(raw['q3_t'+i] !== undefined) q3[i] = Number(raw['q3_t'+i]);
+      if(raw['q7_t'+i] !== undefined) q7[i] = Number(raw['q7_t'+i]);
+    }
+    if(raw.q3_other_apps) q3.other = raw.q3_other_apps;
+    if(raw.q7_other_topics) q7.other_topics = raw.q7_other_topics;
+    return {
+      lang: 'vi',
+      fullname: raw.fullname || null,
+      role: raw.role || null,
+      staff_type: raw.staff_type || null,
+      q1: raw.q1 || null,
+      q3: q3,
+      q4: arr(raw.q4),
+      q4_other: raw.q4_other || null,
+      q5: raw.q5 || null,
+      q6: raw.q6 || null,
+      q7: q7,
+      q9: arr(raw.q9),
+      q9_other: raw.q9_other || null,
+      q10: arr(raw.q10),
+      q10_other: raw.q10_other || null,
+      q11: raw.q11 || null,
+      q12: raw.q12 || null,
+      q13: raw.q13 || null,
+      q14: arr(raw.q14),
+      q15: raw.q15 || null,
+      q16: raw.q16 || null
+    };
+  }
+
+  function submitToSupabase(row){
+    return fetch(window.TNA_SUPABASE_URL + '/rest/v1/tna_responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': window.TNA_SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + window.TNA_SUPABASE_ANON_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(row)
+    }).then(function(res){
+      if(!res.ok) throw new Error('Supabase insert failed: ' + res.status);
+      return true;
+    });
+  }
+
+  // ---------- submit ----------
+  var submitBtn = document.getElementById('submitBtn');
+  var submitError = document.getElementById('submitError');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var raw = {};
+    var fd = new FormData(form);
+    fd.forEach(function(value, key){
+      if(raw[key] === undefined){ raw[key] = value; }
+      else if(Array.isArray(raw[key])){ raw[key].push(value); }
+      else { raw[key] = [raw[key], value]; }
+    });
+    raw['_submitted_at'] = new Date().toISOString();
+    window.__tnaSurveyResult = raw;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Đang gửi...';
+    submitError.classList.remove('show');
+
+    submitToSupabase(buildSupabaseRow(raw)).then(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Nộp khảo sát 🚀';
+      document.getElementById('overlayTitle').textContent = 'Cảm ơn bạn đã hoàn thành khảo sát!';
+      document.getElementById('overlayText').textContent = 'Câu trả lời của bạn đã được ghi nhận lên bảng kết quả trực tiếp. Đội ngũ HRBP sẽ dùng thông tin này để thiết kế chuỗi workshop AI Application phù hợp nhất cho HRBP Team.';
+      document.getElementById('thanksOverlay').classList.add('show');
+    }).catch(function(err){
+      console.error(err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Nộp khảo sát 🚀';
+      submitError.classList.add('show');
+      document.getElementById('overlayTitle').textContent = 'Đã ghi nhận câu trả lời tại chỗ';
+      document.getElementById('overlayText').textContent = 'Không gửi được lên bảng kết quả trực tiếp (có thể do lỗi kết nối hoặc chưa cấu hình hệ thống). Bạn vẫn có thể tải bản sao .json và gửi thủ công cho đội ngũ HRBP.';
+      document.getElementById('thanksOverlay').classList.add('show');
+    });
+  });
+
+  document.getElementById('closeOverlayBtn').addEventListener('click', function(){
+    document.getElementById('thanksOverlay').classList.remove('show');
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function(){
+    var data = window.__tnaSurveyResult || {};
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var namePart = (data.fullname || 'ket_qua').toString().trim().replace(/\s+/g,'_');
+    a.href = url;
+    a.download = 'TNA_AI_Survey_' + namePart + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>
