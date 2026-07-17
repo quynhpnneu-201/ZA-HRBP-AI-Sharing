@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRBP - TNA_AI Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --zalo-blue: #0068FF;
+    --zalo-blue-dark: #0052CC;
+    --zalo-blue-deep: #0A2F6B;
+    --zalo-cyan: #00C2FF;
+    --zalo-mint: #17D8C4;
+    --zalo-coral: #FF6B6B;
+    --zalo-amber: #FFB800;
+    --zalo-yellow: #FFD93D;
+    --ink: #0A2540;
+    --ink-soft: #4A5B78;
+    --line: #E3ECFB;
+    --card: #FFFFFF;
+    --bg-1: #EAF3FF;
+    --bg-2: #F6FBFF;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 8px 24px rgba(0,104,255,0.10);
+    --shadow-card: 0 4px 16px rgba(10,37,64,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Roboto', Arial, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 90% -10%, rgba(0,194,255,0.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(23,216,196,0.14), transparent 55%),
+      linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:'Nunito','Roboto',Arial,sans-serif; margin:0; color:var(--zalo-blue-deep);}
+  p{margin:0;}
+  a{color:var(--zalo-blue);}
+
+  .site-nav{
+    max-width:900px; margin:0 auto; padding:14px 16px 0;
+    display:flex; gap:16px; font-size:12.5px; font-weight:700;
+  }
+  .site-nav a{color:var(--zalo-blue-dark); text-decoration:none; padding:6px 10px; border-radius:999px;}
+  .site-nav a:hover{background:rgba(0,104,255,0.08);}
+  .site-nav a.current{background:var(--zalo-blue); color:#fff;}
+
+  .progress-shell{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:10px 16px;
+  }
+  .progress-inner{
+    max-width:900px; margin:0 auto;
+    display:flex; align-items:center; gap:12px;
+  }
+  .progress-label{font-size:12.5px; font-weight:700; color:var(--zalo-blue-dark); white-space:nowrap;}
+  .progress-track{
+    flex:1; height:10px; border-radius:999px; background:var(--line); overflow:hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .progress-fill{
+    height:100%; width:0%; border-radius:999px;
+    background:linear-gradient(90deg, var(--zalo-mint), var(--zalo-cyan), var(--zalo-blue));
+    transition:width .35s ease;
+  }
+  .progress-pct{font-size:12.5px; font-weight:800; color:var(--zalo-blue); min-width:38px; text-align:right;}
+
+  .hero{ max-width:900px; margin:20px auto 0; padding:0 16px; }
+  .hero-card{
+    position:relative; border-radius:var(--radius-lg); padding:38px 32px 32px;
+    background:linear-gradient(135deg, var(--zalo-blue) 0%, #1E8CFF 45%, var(--zalo-cyan) 100%);
+    color:#fff; overflow:hidden; box-shadow: var(--shadow-soft);
+  }
+  .hero-card::before{
+    content:""; position:absolute; right:-60px; top:-80px; width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+  }
+  .hero-card::after{
+    content:""; position:absolute; left:-40px; bottom:-90px; width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(23,216,196,0.35), transparent 70%);
+  }
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.35); padding:6px 14px; border-radius:999px;
+    font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-bottom:16px;
+  }
+  .hero-title{font-size:28px; font-weight:900; color:#fff; line-height:1.25; position:relative; z-index:1;}
+  .hero-sub{font-size:16px; font-weight:700; color:#EAF7FF; margin-top:6px; position:relative; z-index:1;}
+  .hero-desc{ margin-top:16px; font-size:14.5px; line-height:1.65; color:#F0FAFF; max-width:680px; position:relative; z-index:1; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; position:relative; z-index:1; }
+  .hero-chip{
+    background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.3); border-radius:var(--radius-sm);
+    padding:10px 14px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px;
+  }
+  .hero-note{
+    margin-top:18px; padding:12px 16px; border-radius:var(--radius-sm);
+    background:rgba(10,37,64,0.20); border:1px dashed rgba(255,255,255,0.4);
+    font-size:13px; line-height:1.6; color:#fff; position:relative; z-index:1;
+  }
+
+  .wrap{max-width:900px; margin:0 auto; padding:24px 16px 90px;}
+
+  .section{
+    background:var(--card); border-radius:var(--radius-lg); box-shadow:var(--shadow-card);
+    border:1px solid var(--line); margin-bottom:22px; overflow:hidden; scroll-margin-top:80px;
+  }
+  .section-head{
+    display:flex; align-items:center; gap:14px; padding:20px 24px;
+    background:linear-gradient(90deg, rgba(0,104,255,0.07), rgba(0,194,255,0.04));
+    border-bottom:1px solid var(--line);
+  }
+  .section-num{
+    flex:0 0 auto; width:42px; height:42px; border-radius:14px;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+    color:#fff; font-weight:900; font-size:17px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px rgba(0,104,255,0.30);
+  }
+  .section-title{font-size:18px; font-weight:800;}
+  .section-sub{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-top:2px;}
+  .section-body{padding:22px 24px 26px;}
+
+  .field{margin-bottom:22px;}
+  .field:last-child{margin-bottom:0;}
+  .q-label{ font-size:14.5px; font-weight:700; color:var(--ink); line-height:1.55; margin-bottom:10px; display:block; }
+  .q-index{color:var(--zalo-blue); font-weight:900; margin-right:4px;}
+  .q-hint{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-top:-4px; margin-bottom:10px;}
+
+  input[type="text"], textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:var(--radius-sm); padding:11px 14px;
+    font-size:14px; font-family:'Roboto',Arial,sans-serif; color:var(--ink); background:var(--bg-2);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none; border-color:var(--zalo-blue); box-shadow:0 0 0 4px rgba(0,104,255,0.12); background:#fff;
+  }
+  textarea{resize:vertical; min-height:64px; line-height:1.5;}
+
+  .choice-grid{display:flex; flex-direction:column; gap:8px;}
+  .choice-grid.cols-2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .choice{
+    position:relative; display:flex; align-items:center; gap:10px; padding:11px 14px;
+    border:1.5px solid var(--line); border-radius:var(--radius-sm); background:var(--bg-2);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .choice:hover{border-color:var(--zalo-cyan); background:#fff;}
+  .choice input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer;}
+  .choice-mark{
+    flex:0 0 auto; width:20px; height:20px; border-radius:50%; border:2px solid #B9CCEE; background:#fff;
+    display:flex; align-items:center; justify-content:center; transition:all .15s ease;
+  }
+  .choice input[type="checkbox"] + .choice-mark{border-radius:6px;}
+  .choice-mark::after{
+    content:""; width:10px; height:10px; border-radius:50%;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+    transform:scale(0); transition:transform .15s ease;
+  }
+  .choice input[type="checkbox"] + .choice-mark::after{ width:11px; height:11px; border-radius:3px; background:none; }
+  .choice input[type="checkbox"] + .choice-mark::after{
+    content:"✓"; color:#fff; font-size:12px; font-weight:900;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--zalo-blue), var(--zalo-cyan));
+  }
+  .choice input:checked ~ .choice-mark{border-color:var(--zalo-blue);}
+  .choice input:checked ~ .choice-mark::after{transform:scale(1);}
+  .choice input:checked ~ .choice-text{color:var(--zalo-blue-dark); font-weight:700;}
+  .choice:has(input:checked), .choice.is-checked{
+    border-color:var(--zalo-blue);
+    background:linear-gradient(90deg, rgba(0,104,255,0.06), rgba(0,194,255,0.04));
+    box-shadow:0 2px 8px rgba(0,104,255,0.10);
+  }
+  .choice-text{font-size:13.8px; font-weight:600; color:var(--ink); line-height:1.4;}
+  .choice-other{margin-top:8px;}
+
+  .scale-card{ border:1.5px solid var(--line); border-radius:var(--radius-md); background:var(--bg-2); padding:16px; margin-top:6px; }
+  .scale-legend{ display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--ink-soft); margin-bottom:12px; padding:0 2px; }
+  .scale-options{display:flex; gap:8px;}
+  .scale-opt{ flex:1; position:relative; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .scale-opt input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; width:100%; height:100%;}
+  .scale-opt-inner{
+    width:44px; height:44px; border-radius:50%; border:2px solid var(--line); background:#fff;
+    display:flex; align-items:center; justify-content:center; transition:all .15s ease; cursor:pointer;
+  }
+  .scale-opt-num{font-size:16px; font-weight:900; color:var(--zalo-blue-deep);}
+  .scale-opt input:checked ~ .scale-opt-inner{
+    border-color:var(--zalo-blue); background:linear-gradient(160deg, var(--zalo-blue), #1E8CFF);
+  }
+  .scale-opt input:checked ~ .scale-opt-inner .scale-opt-num{color:#fff;}
+  @media (max-width:380px){ .scale-opt-inner{width:38px; height:38px;} .scale-opt-num{font-size:14px;} }
+  .scale-desc-list{ margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+  .scale-desc-item{ display:flex; gap:8px; font-size:12px; color:var(--ink-soft); font-weight:500; }
+  .scale-desc-item b{color:var(--zalo-blue-dark); font-weight:800; min-width:14px;}
+
+  .matrix-legend{ display:flex; justify-content:flex-end; gap:14px; font-size:11px; font-weight:700; color:var(--ink-soft); margin-bottom:10px; padding-right:2px; }
+  .matrix{display:flex; flex-direction:column; gap:10px;}
+  .matrix-row{
+    border:1.5px solid var(--line); border-radius:var(--radius-md); background:var(--bg-2); padding:12px 14px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .matrix-row-title{font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.4;}
+  .matrix-scale{display:flex; gap:6px;}
+  .matrix-opt{ flex:1; position:relative; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .matrix-opt input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer;}
+  .matrix-opt-inner{
+    width:38px; height:38px; border-radius:50%; border:2px solid #D9E6FB; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:var(--zalo-blue-deep); transition:all .15s ease;
+  }
+  .matrix-opt input:checked ~ .matrix-opt-inner{
+    border-color:transparent; color:#fff;
+    background:linear-gradient(135deg, var(--zalo-mint), var(--zalo-blue));
+    box-shadow:0 3px 8px rgba(0,104,255,0.30);
+  }
+  @media (max-width:520px){ .matrix-opt-inner{width:32px; height:32px; font-size:12px;} }
+
+  .nav-dots{
+    position:fixed; right:18px; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:10px; z-index:40;
+  }
+  .nav-dot{ width:11px; height:11px; border-radius:50%; background:#C7DBFB; cursor:pointer; transition:all .2s ease; border:none; padding:0; }
+  .nav-dot:hover{background:var(--zalo-cyan); transform:scale(1.25);}
+  .nav-dot.active{background:var(--zalo-blue); transform:scale(1.4); box-shadow:0 0 0 4px rgba(0,104,255,0.15);}
+  @media (max-width:900px){ .nav-dots{display:none;} }
+
+  .submit-card{
+    text-align:center; padding:36px 24px;
+    background:linear-gradient(135deg, var(--zalo-blue-deep), var(--zalo-blue) 60%, var(--zalo-cyan));
+    border-radius:var(--radius-lg); color:#fff; box-shadow:var(--shadow-soft);
+  }
+  .submit-card h3{color:#fff; font-size:20px; margin-bottom:8px;}
+  .submit-card p{color:#EAF7FF; font-size:13.5px; margin-bottom:20px;}
+  .btn-submit{
+    background:linear-gradient(135deg, var(--zalo-amber), var(--zalo-coral));
+    color:#fff; border:none; font-family:'Nunito',Arial,sans-serif;
+    font-weight:900; font-size:16px; padding:15px 42px; border-radius:999px; cursor:pointer;
+    box-shadow:0 10px 24px rgba(255,107,107,0.35); transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-submit:hover{transform:translateY(-2px) scale(1.02); box-shadow:0 14px 30px rgba(255,107,107,0.45);}
+  .btn-submit:active{transform:translateY(0) scale(0.99);}
+  .btn-submit:disabled{opacity:.6; cursor:wait; transform:none;}
+  .submit-sub{margin-top:14px; font-size:12px; color:rgba(255,255,255,0.8);}
+  .submit-error{
+    margin-top:14px; padding:10px 14px; border-radius:var(--radius-sm);
+    background:rgba(255,107,107,0.18); border:1px solid rgba(255,107,107,0.5);
+    font-size:12.5px; color:#fff; display:none;
+  }
+  .submit-error.show{display:block;}
+
+  .appendix{ border:1.5px dashed #C7CFE0; border-radius:var(--radius-lg); background:#F4F6FB; margin-top:28px; overflow:hidden; }
+  .appendix summary{ cursor:pointer; list-style:none; padding:18px 24px; display:flex; align-items:center; gap:12px; font-weight:800; font-size:14.5px; color:var(--ink-soft); }
+  .appendix summary::-webkit-details-marker{display:none;}
+  .appendix summary::before{ content:"▸"; font-size:14px; color:var(--zalo-blue); transition:transform .2s; }
+  .appendix[open] summary::before{transform:rotate(90deg);}
+  .appendix-body{padding:0 24px 22px; font-size:13px; color:var(--ink-soft); line-height:1.7;}
+  .appendix-body h4{font-size:13.5px; color:var(--zalo-blue-deep); margin:14px 0 6px;}
+  .appendix-body ul{margin:6px 0 0; padding-left:20px;}
+  .appendix-body li{margin-bottom:6px;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,37,64,0.55);
+    display:none; align-items:center; justify-content:center; z-index:100;
+    padding:20px; backdrop-filter:blur(4px);
+  }
+  .overlay.show{display:flex;}
+  .overlay-card{
+    background:#fff; border-radius:var(--radius-lg); padding:36px 30px;
+    max-width:440px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    position:relative; overflow:hidden;
+  }
+  .overlay-emoji{font-size:54px; margin-bottom:6px;}
+  .overlay-card h3{font-size:21px; margin-bottom:10px;}
+  .overlay-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:20px;}
+  .overlay-actions{display:flex; flex-direction:column; gap:10px;}
+  .btn-secondary{
+    border:1.5px solid var(--line); background:#fff; color:var(--zalo-blue-dark);
+    font-weight:700; font-size:13.5px; padding:12px 18px; border-radius:999px; cursor:pointer;
+  }
+  .btn-secondary:hover{border-color:var(--zalo-blue); background:var(--bg-2);}
+  .btn-close{
+    background:var(--zalo-blue); color:#fff; border:none; font-weight:700;
+    font-size:13.5px; padding:12px 18px; border-radius:999px; cursor:pointer;
+  }
+
+  footer{ text-align:center; font-size:12px; color:var(--ink-soft); padding:20px 16px 40px; }
+
+  @media (max-width:640px){
+    .hero-card{padding:28px 20px 24px;}
+    .hero-title{font-size:22px;}
+    .section-head{padding:16px 18px;}
+    .section-body{padding:18px 18px 22px;}
+    .choice-grid.cols-2{grid-template-columns:1fr;}
+  }
+  @media (max-width:380px){
+    .hero-title{font-size:19px;}
+    .matrix-opt-inner{font-size:11px;}
+    .section-num{width:36px; height:36px; font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="survey-vi.html">📋 Khảo sát (VI)</a>
+  <a href="survey-en.html" class="current">📋 Survey (EN)</a>
+  <a href="results.html">📊 Live Results</a>
+</nav>
+
+<div class="progress-shell">
+  <div class="progress-inner">
+    <span class="progress-label">Survey progress</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+</div>
+
+<div class="nav-dots" id="navDots"></div>
+
+<form id="surveyForm">
+
+<div class="hero">
+  <div class="hero-card">
+    <span class="hero-badge">📋 TNA Survey · HRBP Team</span>
+    <div class="hero-title">Training Needs Assessment (TNA) Survey</div>
+    <div class="hero-sub">“AI Application” Workshop Series for the HRBP Team</div>
+    <div class="hero-desc">
+      This survey aims to identify <b>(1)</b> each team member's current level of understanding / experience with AI applications relevant to HRBP work, and <b>(2)</b> their level of interest &amp; readiness to participate in learning — so the HRBP team can design the content, difficulty level, and roadmap of the workshop series that best fits the group's actual needs (including both FTE and Collaborators).
+    </div>
+    <div class="hero-meta">
+      <span class="hero-chip">⏱️ Estimated time: 8–10 minutes</span>
+      <span class="hero-chip">✅ No right or wrong answers</span>
+      <span class="hero-chip">🔒 Used only for training design</span>
+    </div>
+    <div class="hero-note">
+      💬 Please answer based on your current reality so the training results match actual needs as closely as possible. The information collected is <b>not</b> used to evaluate individual performance.
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PART 1 -->
+  <section class="section" id="part1" data-part="1">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">General Information</div>
+        <div class="section-sub">General Information</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="q-label">Full name</label>
+        <input type="text" name="fullname" placeholder="Enter your full name">
+      </div>
+      <div class="field">
+        <label class="q-label">Job title</label>
+        <input type="text" name="role" placeholder="e.g. HRBP Executive, Senior HRBP...">
+      </div>
+      <div class="field">
+        <label class="q-label">Employment type</label>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="radio" name="staff_type" value="FTE"><span class="choice-mark"></span><span class="choice-text">FTE</span></label>
+          <label class="choice"><input type="radio" name="staff_type" value="Collaborator"><span class="choice-mark"></span><span class="choice-text">Collaborator</span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 2 -->
+  <section class="section" id="part2" data-part="2">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Current AI Knowledge &amp; Experience Level</div>
+        <div class="section-sub">Baseline</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q1.</span>Have you used any AI tools (ChatGPT, Claude, Gemini, Copilot...) in your work?</label>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q1" value="Never used"><span class="choice-mark"></span><span class="choice-text">Never used</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Tried a few times, not yet using regularly"><span class="choice-mark"></span><span class="choice-text">Tried a few times, not yet using regularly</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Use regularly every week"><span class="choice-mark"></span><span class="choice-text">Use regularly every week</span></label>
+          <label class="choice"><input type="radio" name="q1" value="Use daily, as part of my work"><span class="choice-mark"></span><span class="choice-text">Use daily, as part of my work</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q2.</span>For each topic below, rate your current level of KNOWLEDGE / EXPERIENCE, specifically with AI applications</label>
+        <div class="q-hint">Rate your current knowledge / experience level for each topic below</div>
+        <div class="scale-card">
+          <div class="scale-desc-list">
+            <div class="scale-desc-item"><b>1</b> Never used AI, don't understand the basic concepts</div>
+            <div class="scale-desc-item"><b>2</b> Heard of it / tried it 1–2 times, not yet confident using it</div>
+            <div class="scale-desc-item"><b>3</b> Can use it at a basic level (writing simple prompts, for a few familiar tasks)</div>
+            <div class="scale-desc-item"><b>4</b> Proficient across many tasks, confident applying it to daily work</div>
+            <div class="scale-desc-item"><b>5</b> Highly proficient, able to coach / share knowledge with others</div>
+          </div>
+        </div>
+        <div class="matrix-legend"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="matrix" data-matrix="q3"></div>
+        <div class="q-hint" style="margin-top:14px;">Besides these, is there any other AI application you've used at work that you'd like to share? Please describe it specifically.</div>
+        <textarea name="q3_other_apps" rows="3" placeholder="Share the specific AI application you've used at work..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q3.</span>Which AI tools have you used?</label>
+        <div class="q-hint">Multiple choices allowed</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q4" value="ChatGPT"><span class="choice-mark"></span><span class="choice-text">ChatGPT</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Claude"><span class="choice-mark"></span><span class="choice-text">Claude</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Gemini"><span class="choice-mark"></span><span class="choice-text">Gemini</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Microsoft Copilot"><span class="choice-mark"></span><span class="choice-text">Microsoft Copilot</span></label>
+          <label class="choice"><input type="checkbox" name="q4" value="Notion AI / Canva AI"><span class="choice-mark"></span><span class="choice-text">Notion AI / Canva AI</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q4" value="Other"><span class="choice-mark"></span><span class="choice-text">Other</span></label>
+          <input type="text" name="q4_other" placeholder="Please specify if you selected “Other”" style="margin-top:8px;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q4.</span>Have you ever attended any AI-related training or course?</label>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="radio" name="q5" value="Yes"><span class="choice-mark"></span><span class="choice-text">Yes</span></label>
+          <label class="choice"><input type="radio" name="q5" value="No"><span class="choice-mark"></span><span class="choice-text">No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q5.</span>If yes, briefly describe it (course name, main content)</label>
+        <textarea name="q6" rows="3" placeholder="Share briefly here..."></textarea>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 3 -->
+  <section class="section" id="part3" data-part="3">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Interest &amp; Willingness to Participate</div>
+        <div class="section-sub">Interest &amp; Willingness</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q6.</span>For each topic below, rate your level of INTEREST in learning it</label>
+        <div class="q-hint">Rate your interest in learning each topic below</div>
+        <div class="scale-card">
+          <div class="scale-desc-list">
+            <div class="scale-desc-item"><b>1</b> Not interested, don't want to learn this topic</div>
+            <div class="scale-desc-item"><b>2</b> Slightly interested, not a priority to learn</div>
+            <div class="scale-desc-item"><b>3</b> Neutral, willing to learn if it fits</div>
+            <div class="scale-desc-item"><b>4</b> Interested, want to learn</div>
+            <div class="scale-desc-item"><b>5</b> Very interested, want to learn in depth</div>
+          </div>
+        </div>
+        <div class="matrix-legend"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="matrix" data-matrix="q7"></div>
+        <div class="q-hint" style="margin-top:14px;">Any other topics you'd like to learn (optional)</div>
+        <textarea name="q7_other_topics" rows="3" placeholder="Share any other topic you'd like to learn..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q7.</span>What excites you most about learning AI application?</label>
+        <div class="q-hint">Multiple choices allowed</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q9" value="Boosting productivity, saving time"><span class="choice-mark"></span><span class="choice-text">Boosting productivity, saving time</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Reducing repetitive, manual tasks"><span class="choice-mark"></span><span class="choice-text">Reducing repetitive, manual tasks</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Keeping up with new tech trends"><span class="choice-mark"></span><span class="choice-text">Keeping up with new tech trends</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Personal curiosity, wanting to experiment"><span class="choice-mark"></span><span class="choice-text">Personal curiosity, wanting to experiment</span></label>
+          <label class="choice"><input type="checkbox" name="q9" value="Requirement from work / manager"><span class="choice-mark"></span><span class="choice-text">Requirement from work / manager</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q9" value="Other"><span class="choice-mark"></span><span class="choice-text">Other</span></label>
+          <input type="text" name="q9_other" placeholder="Please specify if you selected “Other”" style="margin-top:8px;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q8.</span>What (if anything) makes you hesitant or worried about learning AI?</label>
+        <div class="q-hint">Multiple choices allowed</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q10" value="No / not enough time"><span class="choice-mark"></span><span class="choice-text">No / not enough time</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Don't know where to start"><span class="choice-mark"></span><span class="choice-text">Don't know where to start</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Concerned about data security / privacy"><span class="choice-mark"></span><span class="choice-text">Concerned about data security / privacy</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Intimidated by technology, afraid of falling behind"><span class="choice-mark"></span><span class="choice-text">Intimidated by technology, afraid of falling behind</span></label>
+          <label class="choice"><input type="checkbox" name="q10" value="Don't see it as directly relevant to my work"><span class="choice-mark"></span><span class="choice-text">Don't see it as directly relevant to my work</span></label>
+        </div>
+        <div class="choice-other">
+          <label class="choice"><input type="checkbox" name="q10" value="Other"><span class="choice-mark"></span><span class="choice-text">Other</span></label>
+          <input type="text" name="q10_other" placeholder="Please specify if you selected “Other”" style="margin-top:8px;">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 4 -->
+  <section class="section" id="part4" data-part="4">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">Specific Learning Needs</div>
+        <div class="section-sub">Specific Learning Needs</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q9.</span>In your day-to-day HRBP work, what are 1–3 pain points / time-consuming tasks you'd like AI to help solve?</label>
+        <textarea name="q11" rows="4" placeholder="e.g. screening CVs, compiling turnover reports..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q10.</span>After this workshop series, what would you like to be able to do?</label>
+        <div class="q-hint">Specific expected outcomes</div>
+        <textarea name="q12" rows="4" placeholder="Share your expectations here..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q11.</span>Which group do you consider yourself in?</label>
+        <div class="q-hint">Choose 1</div>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q13" value="Beginner"><span class="choice-mark"></span><span class="choice-text">Beginner — haven't / barely used AI</span></label>
+          <label class="choice"><input type="radio" name="q13" value="Know the basics"><span class="choice-mark"></span><span class="choice-text">Know the basics — want to learn more advanced skills and apply them deeper at work</span></label>
+          <label class="choice"><input type="radio" name="q13" value="Already proficient"><span class="choice-mark"></span><span class="choice-text">Already proficient — want to learn advanced applications / tools</span></label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 5 -->
+  <section class="section" id="part5" data-part="5">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">Preferred Learning Format</div>
+        <div class="section-sub">Preferred Learning Format</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q12.</span>Your preferred learning format</label>
+        <div class="q-hint">Multiple choices allowed</div>
+        <div class="choice-grid cols-2">
+          <label class="choice"><input type="checkbox" name="q14" value="Theory presentation / demo"><span class="choice-mark"></span><span class="choice-text">Theory presentation / demo</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="Hands-on practice"><span class="choice-mark"></span><span class="choice-text">Hands-on practice</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="Case study / group discussion"><span class="choice-mark"></span><span class="choice-text">Case study / group discussion</span></label>
+          <label class="choice"><input type="checkbox" name="q14" value="A mix of the above formats"><span class="choice-mark"></span><span class="choice-text">A mix of the above formats</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q13.</span>What session duration works best for you?</label>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="q15" value="About 1 hour"><span class="choice-mark"></span><span class="choice-text">About 1 hour</span></label>
+          <label class="choice"><input type="radio" name="q15" value="1–1.5 hours"><span class="choice-mark"></span><span class="choice-text">1–1.5 hours</span></label>
+          <label class="choice"><input type="radio" name="q15" value="About 2 hours"><span class="choice-mark"></span><span class="choice-text">About 2 hours</span></label>
+          <label class="choice"><input type="radio" name="q15" value="More than 2 hours"><span class="choice-mark"></span><span class="choice-text">More than 2 hours</span></label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 6 -->
+  <section class="section" id="part6" data-part="6">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">Additional Feedback</div>
+        <div class="section-sub">Additional Feedback</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="q-label"><span class="q-index">Q14.</span>Do you have any other suggestions or feedback for this workshop series?</label>
+        <textarea name="q16" rows="4" placeholder="Share your feedback here..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="submit-card">
+    <h3>🎉 Almost done!</h3>
+    <p>Thank you for taking the time to complete this survey. Your input will help the HRBP team design the AI workshop series that best fits the whole group.</p>
+    <button type="submit" class="btn-submit" id="submitBtn">Submit Survey 🚀</button>
+    <div class="submit-sub">Your answers will be sent straight to the HRBP team's live results board.</div>
+    <div class="submit-error" id="submitError">⚠️ Couldn't submit to the system (check your connection). You can still download your results to send manually.</div>
+  </div>
+
+  <details class="appendix">
+    <summary>📎 Appendix — for HRBP / program designers</summary>
+    <div class="appendix-body">
+      <h4>How to use TNA results to decide the workshop design flow</h4>
+      <p>After collecting responses, open the "Live Results" board (results.html) to compare Question 2 (knowledge) with Question 6 (interest) per topic — it automatically averages scores and updates continuously.</p>
+
+      <h4>Decision principles</h4>
+      <ul>
+        <li>If the proficiency gap <b>between individuals</b> is large (some are very new, some already proficient) across most topics → design by <b>PROFICIENCY LEVEL</b>: split into Beginner / Intermediate–Advanced tracks, with a shared foundation session before splitting groups.</li>
+        <li>If individual proficiency is fairly even, but scores differ clearly <b>between topics</b> (e.g. everyone is weak at Prompt Engineering but fine at writing emails) → design by <b>TOPIC</b>: consecutive sessions per application topic, with the whole group learning together.</li>
+        <li>If both factors vary significantly → design a <b>HYBRID</b>: 1 shared foundation session (to align knowledge + expectations) + topic-based modules, each with exercises split into 2 difficulty levels (basic / advanced) so everyone participates together but practices at their own level.</li>
+      </ul>
+
+      <h4>Cross-reference Knowledge (Q2) with Interest (Q6) per topic to prioritize content</h4>
+      <ul>
+        <li><b>High interest – Low knowledge:</b> prioritize adding to the program early (real need, easy to motivate).</li>
+        <li><b>High interest – High knowledge:</b> consider inviting them to share a case study / mentor the group.</li>
+        <li><b>Low interest – Low knowledge:</b> clarify the benefits / concrete use cases before technical training.</li>
+        <li><b>Low interest – High knowledge:</b> leverage them as a champion, no need to prioritize further training.</li>
+      </ul>
+
+      <p>Also cross-check with Question 11 (self-assessed group) to confirm the above decision fits the group's actual preferences, before finalizing the workshop flow.</p>
+    </div>
+  </details>
+
+  <footer>TNA Survey · AI Application Workshop for HRBP Team · Confidential, used only for internal training design purposes</footer>
+
+</div>
+</form>
+
+<div class="overlay" id="thanksOverlay">
+  <div class="overlay-card">
+    <div class="overlay-emoji">🎉</div>
+    <h3 id="overlayTitle">Thank you for completing the survey!</h3>
+    <p id="overlayText">Your responses have been recorded on the live results board. The HRBP team will use this information to design the AI Application workshop series that best fits the HRBP Team.</p>
+    <div class="overlay-actions">
+      <a href="results.html" class="btn-close" style="text-decoration:none; display:inline-block;">📊 View live results</a>
+      <button type="button" class="btn-secondary" id="downloadBtn">⬇️ Save a copy (.json) locally</button>
+      <button type="button" class="btn-secondary" id="closeOverlayBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+  var TOPICS = [
+    "1. Writing JDs / job descriptions with AI",
+    "3. Drafting emails, policies, internal announcements with AI",
+    "4. Analyzing HR data (turnover, engagement, C&B...) with AI",
+    "7. Automating HR processes (workflows, forms, approvals) with AI",
+    "8. Chatbots / virtual assistants for employee support",
+    "9. Ethics & data security when using AI in HR"
+  ];
+
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function buildMatrix(name){
+    var el = document.querySelector('.matrix[data-matrix="' + name + '"]');
+    if(!el) return;
+    var html = "";
+    TOPICS.forEach(function(topic, idx){
+      html += '<div class="matrix-row"><div class="matrix-row-title">' + escapeHtml(topic) + '</div><div class="matrix-scale">';
+      for(var v=1; v<=5; v++){
+        html += '<label class="matrix-opt"><input type="radio" name="'+name+'_t'+idx+'" value="'+v+'"><span class="matrix-opt-inner">'+v+'</span></label>';
+      }
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+  buildMatrix('q3');
+  buildMatrix('q7');
+
+  var form = document.getElementById('surveyForm');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.section'));
+  var navDotsWrap = document.getElementById('navDots');
+  sections.forEach(function(sec){
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'nav-dot';
+    dot.title = sec.querySelector('.section-title').textContent;
+    dot.addEventListener('click', function(){
+      sec.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    navDotsWrap.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(navDotsWrap.children);
+
+  function trackableInputs(){
+    return Array.prototype.slice.call(form.querySelectorAll('input[type="text"], textarea, input[type="radio"], input[type="checkbox"]'));
+  }
+
+  function computeProgress(){
+    var groups = {};
+    trackableInputs().forEach(function(inp){
+      var key = inp.name;
+      if(!groups[key]) groups[key] = {type: inp.type, filled:false};
+      if(inp.type === 'radio' || inp.type === 'checkbox'){
+        if(inp.checked) groups[key].filled = true;
+      } else {
+        if(inp.value && inp.value.trim().length>0) groups[key].filled = true;
+      }
+    });
+    var keys = Object.keys(groups);
+    var filled = keys.filter(function(k){ return groups[k].filled; }).length;
+    var pct = keys.length ? Math.round((filled/keys.length)*100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+
+  function syncChoiceHighlight(){
+    Array.prototype.slice.call(form.querySelectorAll('.choice')).forEach(function(choiceEl){
+      var input = choiceEl.querySelector('input');
+      choiceEl.classList.toggle('is-checked', !!(input && input.checked));
+    });
+  }
+  form.addEventListener('change', function(e){
+    if(e.target && e.target.type === 'radio' && e.target.name){
+      Array.prototype.slice.call(form.querySelectorAll('input[name="'+e.target.name+'"]')).forEach(function(radio){
+        var choiceEl = radio.closest('.choice');
+        if(choiceEl) choiceEl.classList.toggle('is-checked', radio.checked);
+      });
+    } else if(e.target && e.target.type === 'checkbox'){
+      var choiceEl = e.target.closest('.choice');
+      if(choiceEl) choiceEl.classList.toggle('is-checked', e.target.checked);
+    }
+  });
+  syncChoiceHighlight();
+
+  form.addEventListener('input', computeProgress);
+  form.addEventListener('change', computeProgress);
+  computeProgress();
+
+  function updateActiveDot(){
+    var scrollPos = window.scrollY + 140;
+    var activeIdx = 0;
+    sections.forEach(function(sec, i){
+      if(sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===activeIdx); });
+  }
+  window.addEventListener('scroll', updateActiveDot);
+  updateActiveDot();
+
+  function arr(v){ return v===undefined ? [] : (Array.isArray(v) ? v : [v]); }
+
+  function buildSupabaseRow(raw){
+    var q3 = {}, q7 = {};
+    for(var i=0;i<TOPICS.length;i++){
+      if(raw['q3_t'+i] !== undefined) q3[i] = Number(raw['q3_t'+i]);
+      if(raw['q7_t'+i] !== undefined) q7[i] = Number(raw['q7_t'+i]);
+    }
+    if(raw.q3_other_apps) q3.other = raw.q3_other_apps;
+    if(raw.q7_other_topics) q7.other_topics = raw.q7_other_topics;
+    return {
+      lang: 'en',
+      fullname: raw.fullname || null,
+      role: raw.role || null,
+      staff_type: raw.staff_type || null,
+      q1: raw.q1 || null,
+      q3: q3,
+      q4: arr(raw.q4),
+      q4_other: raw.q4_other || null,
+      q5: raw.q5 || null,
+      q6: raw.q6 || null,
+      q7: q7,
+      q9: arr(raw.q9),
+      q9_other: raw.q9_other || null,
+      q10: arr(raw.q10),
+      q10_other: raw.q10_other || null,
+      q11: raw.q11 || null,
+      q12: raw.q12 || null,
+      q13: raw.q13 || null,
+      q14: arr(raw.q14),
+      q15: raw.q15 || null,
+      q16: raw.q16 || null
+    };
+  }
+
+  function submitToSupabase(row){
+    return fetch(window.TNA_SUPABASE_URL + '/rest/v1/tna_responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': window.TNA_SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + window.TNA_SUPABASE_ANON_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(row)
+    }).then(function(res){
+      if(!res.ok) throw new Error('Supabase insert failed: ' + res.status);
+      return true;
+    });
+  }
+
+  var submitBtn = document.getElementById('submitBtn');
+  var submitError = document.getElementById('submitError');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var raw = {};
+    var fd = new FormData(form);
+    fd.forEach(function(value, key){
+      if(raw[key] === undefined){ raw[key] = value; }
+      else if(Array.isArray(raw[key])){ raw[key].push(value); }
+      else { raw[key] = [raw[key], value]; }
+    });
+    raw['_submitted_at'] = new Date().toISOString();
+    window.__tnaSurveyResult = raw;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    submitError.classList.remove('show');
+
+    submitToSupabase(buildSupabaseRow(raw)).then(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Survey 🚀';
+      document.getElementById('overlayTitle').textContent = 'Thank you for completing the survey!';
+      document.getElementById('overlayText').textContent = "Your responses have been recorded on the live results board. The HRBP team will use this information to design the AI Application workshop series that best fits the HRBP Team.";
+      document.getElementById('thanksOverlay').classList.add('show');
+    }).catch(function(err){
+      console.error(err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Survey 🚀';
+      submitError.classList.add('show');
+      document.getElementById('overlayTitle').textContent = 'Saved locally';
+      document.getElementById('overlayText').textContent = "Couldn't submit to the live results board (connection issue or the system isn't configured yet). You can still download a .json copy and send it manually to the HRBP team.";
+      document.getElementById('thanksOverlay').classList.add('show');
+    });
+  });
+
+  document.getElementById('closeOverlayBtn').addEventListener('click', function(){
+    document.getElementById('thanksOverlay').classList.remove('show');
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function(){
+    var data = window.__tnaSurveyResult || {};
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var namePart = (data.fullname || 'result').toString().trim().replace(/\s+/g,'_');
+    a.href = url;
+    a.download = 'TNA_AI_Survey_' + namePart + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>
